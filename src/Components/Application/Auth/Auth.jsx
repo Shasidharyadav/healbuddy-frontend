@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../api'; // Import the centralized API instance
+import api from '../../../api'; // Import the centralized API instance
 import { useNavigate } from 'react-router-dom';
 import './Auth.css';
 

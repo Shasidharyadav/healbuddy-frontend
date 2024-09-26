@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../api'; // Import the centralized API instance
+import api from '../../../../api'; // Import the centralized API instance
 import * as XLSX from 'xlsx';
 
 const CalculateScoreButton = ({ profileId }) => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api'; // Import the centralized API instance
+import api from '../../../api'; // Import the centralized API instance
 import './Dashboard.css';
 import AssesHome from '../Assessment/AssesHome/AssesHome'; // Adjust the path based on your structure
 
