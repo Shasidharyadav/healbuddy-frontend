@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import api from '../../../../api'; // Import the centralized API instance
+import api from '../../../../api'; // Import your custom Axios instance
 import LevelOneAssessment from './LevelOneAssessment';
 import LevelTwoAssessment from './LevelTwoAssessment';
 import LevelTwoConfirmation from './LevelTwoConfirmation';
-import CalculateScoreButton from './CalculateScoreButton';
 import './style/AssesHome.css';
 
 const AssesHome = ({ profileId }) => {
@@ -15,22 +14,13 @@ const AssesHome = ({ profileId }) => {
 
     useEffect(() => {
         const fetchProfile = async () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                console.error('Token is not available');
-                return;
-            }
-
             if (!profileId) {
                 console.error('Profile ID is not defined');
                 return;
             }
 
             try {
-                // Use centralized API instance for fetching profile
-                const response = await api.get(`/api/profiles/${profileId}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const response = await api.get(`/api/profiles/${profileId}`);
                 setProfile(response.data);
             } catch (error) {
                 console.error('Error fetching profile:', error);
@@ -55,17 +45,13 @@ const AssesHome = ({ profileId }) => {
         const assessmentSummary = {
             profileId,
             levelOneAnswers,
-            levelTwoAnswers: answers // Ensuring levelTwoAnswers are included
+            levelTwoAnswers: answers, // Ensuring levelTwoAnswers are included
         };
 
         console.log('Submitting assessment summary:', assessmentSummary); // Log the payload
 
         try {
-            const token = localStorage.getItem('token');
-            // Use centralized API instance for posting assessment summary
-            const response = await api.post('/api/assessment-summary', assessmentSummary, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await api.post('/api/assessment-summary', assessmentSummary);
             console.log('Assessment summary saved:', response.data);
         } catch (error) {
             console.error('Error saving assessment summary:', error.response ? error.response.data : error.message);
@@ -115,7 +101,6 @@ const AssesHome = ({ profileId }) => {
             <div className="assessment-frame">
                 {renderAssessment()}
                 {renderSummary()}
-                <CalculateScoreButton profileId={profileId} />
             </div>
         </div>
     );

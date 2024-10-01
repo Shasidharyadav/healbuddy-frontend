@@ -1,0 +1,86 @@
+/* Container for the calculate score button and results */
+.calculate-score-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* Button to trigger the score calculation */
+.calculate-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 20px;
+    transition: background-color 0.3s;
+}
+
+/* Hover effect for the calculate button */
+.calculate-button:hover {
+    background-color: #0056b3;
+}
+
+/* Container for displaying extracted diagnosis data */
+.diagnosis-data {
+    margin-top: 20px;
+    width: 100%;
+    overflow-x: auto;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling for the diagnosis data table */
+.diagnosis-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+/* Table headers */
+.diagnosis-table th {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    text-align: left;
+    font-weight: bold;
+}
+
+/* Table cells */
+.diagnosis-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    word-wrap: break-word;
+}
+
+/* Alternating row colors for better readability */
+.diagnosis-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Styling for the success message */
+.success-message {
+    color: green;
+    font-weight: bold;
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Styling for error messages */
+.error-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 20px;
+    text-align: center;
+}
