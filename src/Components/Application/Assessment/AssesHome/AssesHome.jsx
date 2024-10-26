@@ -3,6 +3,8 @@ import api from '../../../../api'; // Import your custom Axios instance
 import LevelOneAssessment from './LevelOneAssessment';
 import LevelTwoAssessment from './LevelTwoAssessment';
 import LevelTwoConfirmation from './LevelTwoConfirmation';
+import CalculateScoreButton from './CalculateScoreButton';
+
 import './style/AssesHome.css';
 
 const AssesHome = ({ profileId }) => {
@@ -101,6 +103,7 @@ const AssesHome = ({ profileId }) => {
             <div className="assessment-frame">
                 {renderAssessment()}
                 {renderSummary()}
+                <CalculateScoreButton profileId={profileId} />
             </div>
         </div>
     );
