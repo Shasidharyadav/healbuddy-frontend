@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import api from '../../../../api'; // Import the centralized API instance
+import api from '../../../../api';
 import * as XLSX from 'xlsx';
-import './style/CalculateScoreButton.css'; // Import the CSS file
+import './style/CalculateScoreButton.css';
 
 const CalculateScoreButton = ({ profileId }) => {
-    const [diagnosisData, setDiagnosisData] = useState(null);  // Store the Provisional Diagnosis data
-    const [submissionSuccess, setSubmissionSuccess] = useState(false);  // Track submission status
-    const [error, setError] = useState(null);  // Track errors
+    const [diagnosisData, setDiagnosisData] = useState(null);
+    const [submissionSuccess, setSubmissionSuccess] = useState(false);
+    const [error, setError] = useState(null);
 
-    // Function to fetch profile data (name, age, gender) by profileId
     const fetchProfileData = async (profileId) => {
         try {
             const response = await api.get(`/api/profiles/${profileId}`);
@@ -55,16 +54,6 @@ const CalculateScoreButton = ({ profileId }) => {
         return null;
     };
 
-    const clearColumn = (sheet, column) => {
-        const range = XLSX.utils.decode_range(sheet['!ref']);
-        for (let R = range.s.r; R <= range.e.r; ++R) {
-            const cellAddress = XLSX.utils.encode_cell({ r: R, c: XLSX.utils.decode_col(column) });
-            if (sheet[cellAddress]) {
-                sheet[cellAddress].v = '';
-            }
-        }
-    };
-
     const extractColumnsBCD = (sheet) => {
         if (!sheet['!ref']) {
             console.error('Sheet reference range is missing or incorrect.');
@@ -84,20 +73,6 @@ const CalculateScoreButton = ({ profileId }) => {
         }
 
         return extractedData;
-    };
-
-    const formatExtractedData = (data) => {
-        const formattedData = {};
-        data.forEach((item) => {
-            if (Array.isArray(item)) {
-                if (item.length === 2) {
-                    formattedData[item[0]] = item[1];
-                } else if (item.length > 2) {
-                    formattedData[item[0]] = item.slice(1);
-                }
-            }
-        });
-        return formattedData;
     };
 
     const sendExtractedDataToBackend = async (data) => {
@@ -132,39 +107,27 @@ const CalculateScoreButton = ({ profileId }) => {
         }
     };
 
-    const extractDataFromSavedFile = async (filePath) => {
-        try {
-            const response = await api.get(`/api/files/extractData`, {
-                params: { filePath, profileId },
-            });
+    const reloadWorkbookForRecalculation = async (filePath) => {
+        const response = await api.get(`/api/files/downloadWorkbook`, {
+            params: { filePath },
+            responseType: 'arraybuffer'
+        });
 
-            if (!response.data['Provisional Diagnosis']) {
-                throw new Error('Provisional Diagnosis sheet is missing.');
-            }
+        const workbook = XLSX.read(response.data, { type: 'array' });
+        const recalculatedSheet = workbook.Sheets['Provisional Diagnosis'];
 
-            const diagnosisSheet = response.data['Provisional Diagnosis'];
-            const columnsBCDData = extractColumnsBCD(diagnosisSheet);
-            return columnsBCDData;
-        } catch (error) {
-            throw error;
+        if (!recalculatedSheet) {
+            throw new Error('Provisional Diagnosis sheet is missing after recalculation.');
         }
-    };
 
-    const deleteSavedFile = async (filePath) => {
-        try {
-            await api.delete(`/api/files/deleteFile`, {
-                params: { filePath },
-            });
-        } catch (error) {
-            throw error;
-        }
+        return extractColumnsBCD(recalculatedSheet);
     };
 
     const calculateScore = async () => {
         try {
             const profileData = await fetchProfileData(profileId);
-
             const response = await api.get(`/api/assessment-summary/${profileId}/answers`);
+
             if (response.status === 404) {
                 return;
             }
@@ -178,12 +141,7 @@ const CalculateScoreButton = ({ profileId }) => {
             }
 
             const arrayBuffer = await fileResponse.arrayBuffer();
-            let workbook;
-            try {
-                workbook = XLSX.read(arrayBuffer, { type: 'array' });
-            } catch (error) {
-                throw new Error('Failed to parse Excel file.');
-            }
+            let workbook = XLSX.read(arrayBuffer, { type: 'array' });
 
             const diagnosisSheet = workbook.Sheets['Provisional Diagnosis'];
             if (!diagnosisSheet) {
@@ -202,7 +160,7 @@ const CalculateScoreButton = ({ profileId }) => {
 
             const savedFilePath = await saveUpdatedWorkbook(workbook);
 
-            const extractedData = await extractDataFromSavedFile(savedFilePath);
+            const extractedData = await reloadWorkbookForRecalculation(savedFilePath);
 
             await sendExtractedDataToBackend(extractedData);
 
